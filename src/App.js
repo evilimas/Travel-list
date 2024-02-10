@@ -1,11 +1,5 @@
 import { useState } from 'react';
 
-const initialItems = [
-  { id: 1, description: 'Passport', quantity: 2, packed: false },
-  { id: 2, description: 'Socks', quantity: 12, packed: false },
-  { id: 3, description: 'Charger', quantity: 1, packed: true },
-];
-
 export default function App() {
   const [items, setItems] = useState([]);
   const [data, setData] = useState([]);
@@ -16,12 +10,24 @@ export default function App() {
   function handleDeleteItem(id) {
     setItems((items) => items.filter((item) => item.id !== id));
   }
+  function handleToggleItem(id) {
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item
+      )
+    );
+  }
 
   return (
     <div className="app">
       <Logo />
       <Form data={data} setData={setData} onAddItems={handleAddItems} />
-      <PackingList data={data} items={items} onDeleteItem={handleDeleteItem} />
+      <PackingList
+        data={data}
+        items={items}
+        onDeleteItem={handleDeleteItem}
+        onToggleItem={handleToggleItem}
+      />
       <Stats />
     </div>
   );
@@ -73,21 +79,31 @@ function Form({ data, setData, onAddItems }) {
   );
 }
 
-function PackingList({ data, items, onDeleteItem }) {
+function PackingList({ data, items, onDeleteItem, onToggleItem }) {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item item={item} key={item.id} onDeleteItem={onDeleteItem} />
+          <Item
+            item={item}
+            key={item.id}
+            onDeleteItem={onDeleteItem}
+            onToggleItem={onToggleItem}
+          />
         ))}
       </ul>
     </div>
   );
 }
 
-function Item({ item, onDeleteItem }) {
+function Item({ item, onDeleteItem, onToggleItem }) {
   return (
     <li className="item">
+      <input
+        type="checkbox"
+        value={item.packed}
+        onChange={() => onToggleItem(item.id)}
+      />
       <span style={item.packed ? { textDecoration: 'line-through' } : {}}>
         {item.quantity} {item.description}
       </span>
